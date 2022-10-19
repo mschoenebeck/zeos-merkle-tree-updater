@@ -768,19 +768,7 @@ val update_merkle_tree(unsigned int leaf_count_l,
     return val(typed_memory_view(nu_nodes.size() * sizeof(uint64_t), reinterpret_cast<uint8_t*>(nu_nodes.data())));
 }
 
-val update_merkle_tree2(unsigned int leaf_count, 
-                       unsigned int tree_depth, 
-                       uintptr_t final_nodes, 
-                       unsigned int final_nodes_num, 
-                       uintptr_t note_commitments, 
-                       unsigned int note_commitments_num)
-{
-    uint64_t* nc = reinterpret_cast<uint64_t*>(note_commitments);
-    return val(typed_memory_view(1 * sizeof(uint64_t), reinterpret_cast<uint8_t*>(nc)));
-}
-
 EMSCRIPTEN_BINDINGS(x)
 {
     emscripten::function("update_merkle_tree", &update_merkle_tree);
-    emscripten::function("update_merkle_tree2", &update_merkle_tree2);
 }
