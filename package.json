@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@liquidapps/dapp-client": "^2.0.7804",
+    "async": "^3.2.2",
+    "node-fetch": "2.6.6"
+  }
+}
