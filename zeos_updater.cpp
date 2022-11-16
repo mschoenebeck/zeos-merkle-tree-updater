@@ -678,15 +678,15 @@ struct merkle_node
 void insert_into_merkle_tree(map<uint64_t, merkle_node>& tree, uint64_t& leaf_count, const uint64_t& depth, const Fp& leaf)
 {
     // calculate array index of next free leaf in >local< tree
-    uint64_t idx = MT_ARR_LEAF_ROW_OFFSET(depth-1) + leaf_count % MT_NUM_LEAVES(depth-1);
+    uint64_t idx = MT_ARR_LEAF_ROW_OFFSET(depth) + leaf_count % MT_NUM_LEAVES(depth);
     // calculate tree offset to translate array indices of >local< tree to global array indices
-    uint64_t tos = leaf_count / MT_NUM_LEAVES(depth-1) /*=tree_idx*/ * MT_ARR_FULL_TREE_OFFSET(depth-1);
+    uint64_t tos = leaf_count / MT_NUM_LEAVES(depth) /*=tree_idx*/ * MT_ARR_FULL_TREE_OFFSET(depth);
 
     // insert leaf into tree
     tree[tos + idx] = {'N', leaf};
 
     // calculate merkle path up to root
-    for(int d = 0; d < depth-1; d++)
+    for(int d = 0; d < depth; d++)
     {
         // if array index of node is uneven it is always the left child
         bool is_left_child = 1 == idx % 2;
