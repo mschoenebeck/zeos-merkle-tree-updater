@@ -735,8 +735,15 @@ val update_merkle_tree(unsigned int leaf_count_l,
     uint64_t* nc = reinterpret_cast<uint64_t*>(note_commitments);
     uint64_t lc = static_cast<unsigned long long>(leaf_count_h) << 32 | leaf_count_l;
     
+    // the very first node in the list is the old tree root which is needed to later verify
+    // the current tree state on the smart contract side (i.e. did the tree state change during
+    // execution of this handler function)
+    // fn[0] is zero because of line 71 in JS handler:
+    // var final_nodes = "0000000000000000" + tree_root;
+    merkle_node tree_root = {'R', Fp({fn[1], fn[2], fn[3], fn[4]})};
+
     // read final nodes and add to tree
-    for(unsigned int i = 0; i < final_nodes_num; i++)
+    for(unsigned int i = 1; i < final_nodes_num; i++)
     {
         // 5 x uint64_t: index (1) and value (4)
         tree[fn[i*5+0]] = {'F', Fp({fn[i*5+1], fn[i*5+2], fn[i*5+3], fn[i*5+4]})};
@@ -749,8 +756,15 @@ val update_merkle_tree(unsigned int leaf_count_l,
         insert_into_merkle_tree(tree, lc, tree_depth, leaf);
     }
     
-    // collect updated ('U') and new ('N') nodes
+    // Collect updated ('U') and new ('N') nodes to return changes to smart contract. The very first node
+    // in the list is the old merkle root 'tree_root' which is just passed through to the smart contract
+    // to later verify the tree state didn't change during execution of this handler.
     vector<uint64_t> nu_nodes;
+    nu_nodes.push_back(0);
+    nu_nodes.push_back(tree_root.val.data[0]);
+    nu_nodes.push_back(tree_root.val.data[1]);
+    nu_nodes.push_back(tree_root.val.data[2]);
+    nu_nodes.push_back(tree_root.val.data[3]);
     for(auto it = tree.begin(); it != tree.end(); ++it)
     {
         if(it->second.state == 'F')
